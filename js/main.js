@@ -85,4 +85,75 @@
             }
         });
     }
+
+    const isEditableElement = (target) => {
+        if (!(target instanceof HTMLElement)) {
+            return false;
+        }
+        const tag = target.tagName;
+        return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable;
+    };
+
+    const blockedShortcuts = new Set(['c', 'x', 'u', 's', 'a', 'p']);
+
+    document.body.classList.add('protected-content');
+
+    document.addEventListener('contextmenu', (event) => {
+        if (!isEditableElement(event.target)) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener('copy', (event) => {
+        if (!isEditableElement(event.target)) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener('cut', (event) => {
+        if (!isEditableElement(event.target)) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener('selectstart', (event) => {
+        if (!isEditableElement(event.target)) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener('dragstart', (event) => {
+        const target = event.target;
+        if (target instanceof HTMLElement && target.closest('img, video, canvas')) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        const key = event.key.toLowerCase();
+        const blockedDevtools =
+            key === 'f12' ||
+            (event.ctrlKey && event.shiftKey && (key === 'i' || key === 'j' || key === 'c'));
+
+        const blockedCommon = event.ctrlKey && blockedShortcuts.has(key);
+
+        if (blockedDevtools || blockedCommon) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+
+    const devtoolsThreshold = 160;
+    let devtoolsOpen = false;
+
+    setInterval(() => {
+        const widthGap = window.outerWidth - window.innerWidth;
+        const heightGap = window.outerHeight - window.innerHeight;
+        const looksOpen = widthGap > devtoolsThreshold || heightGap > devtoolsThreshold;
+
+        if (looksOpen !== devtoolsOpen) {
+            devtoolsOpen = looksOpen;
+            document.body.classList.toggle('devtools-blocked', devtoolsOpen);
+        }
+    }, 1000);
 })();

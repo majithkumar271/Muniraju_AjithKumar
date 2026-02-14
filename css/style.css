@@ -35,6 +35,50 @@ body {
     background: radial-gradient(circle at 50% 8%, #dce7ff 0%, rgba(220, 231, 255, 0) 38%), var(--bg-main);
     overflow-x: hidden;
 }
+
+body.protected-content,
+body.protected-content * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+body.protected-content input,
+body.protected-content textarea,
+body.protected-content select,
+body.protected-content [contenteditable='true'] {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+body.protected-content img {
+    -webkit-user-drag: none;
+    user-drag: none;
+}
+
+body.devtools-blocked {
+    overflow: hidden;
+}
+
+body.devtools-blocked::before {
+    content: 'Inspect tools are disabled on this page.';
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    font-weight: 700;
+    color: #fff;
+    background: rgba(18, 22, 35, 0.95);
+}
+
+body.devtools-blocked > * {
+    visibility: hidden !important;
+}
+
 button,
 input,
 textarea,
